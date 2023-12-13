@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  wgdashboard:
+    build: .
+    container_name: wgdashboard
+    volumes:
+      - ./wireguard:/etc/wireguard
+      - ./config:/app/config
+    ports:
+      - "51820:51820/udp"
+      - "10086:10086/tcp"
+    restart: unless-stopped
+    environment:
+      - WG_ADDRESS=10.50.0.1/19
+      - WG_PORT=51820
+      - DEFAULT_REMOTE_ENDPOINT=1.2.3.4
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
