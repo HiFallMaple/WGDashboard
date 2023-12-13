@@ -16,7 +16,7 @@ fi
 
 dashes='------------------------------------------------------------'
 equals='============================================================'
-help () {
+help() {
   printf "=================================================================================\n"
   printf "+          <WGDashboard> by Donald Zou - https://github.com/donaldzou           +\n"
   printf "=================================================================================\n"
@@ -32,50 +32,49 @@ help () {
   printf "=================================================================================\n"
 }
 
-_check_and_set_venv(){
-    # This function will not be using in v3.0
-    # deb/ubuntu users: might need a 'apt install python3.8-venv'
-    # set up the local environment
-    APP_ROOT=`pwd`
-    VIRTUAL_ENV="${APP_ROOT%/*}/venv"
-    if [ ! -d $VIRTUAL_ENV ]; then
-        python3 -m venv $VIRTUAL_ENV
-    fi
-    . ${VIRTUAL_ENV}/bin/activate
+_check_and_set_venv() {
+  # This function will not be using in v3.0
+  # deb/ubuntu users: might need a 'apt install python3.8-venv'
+  # set up the local environment
+  APP_ROOT=$(pwd)
+  VIRTUAL_ENV="${APP_ROOT%/*}/venv"
+  if [ ! -d $VIRTUAL_ENV ]; then
+    python3 -m venv $VIRTUAL_ENV
+  fi
+  . ${VIRTUAL_ENV}/bin/activate
 }
 
-install_wgd(){
-    printf "| Starting to install WGDashboard                          |\n"
-    version_pass=$(python3 -c 'import sys; print("1") if (sys.version_info.major == 3 and sys.version_info.minor >= 7) else print("0");')
-    if [ $version_pass == "0" ]
-      then printf "| WGDashboard required Python 3.7 or above          |\n"
-      printf "%s\n" "$dashes"
-      exit 1
-    fi
-    if [ ! -d "db" ]
-      then mkdir "db"
-    fi
-    if [ ! -d "log" ]
-      then mkdir "log"
-    fi
-    printf "| Upgrading pip                                            |\n"
-    python3 -m pip install -U pip > /dev/null 2>&1
-    printf "| Installing latest Python dependencies                    |\n"
-    python3 -m pip install -U -r requirements.txt > /dev/null 2>&1
-    printf "| WGDashboard installed successfully!                      |\n"
-    printf "| Enter ./wgd.sh start to start the dashboard              |\n"
+install_wgd() {
+  printf "| Starting to install WGDashboard                          |\n"
+  version_pass=$(python3 -c 'import sys; print("1") if (sys.version_info.major == 3 and sys.version_info.minor >= 7) else print("0");')
+  if [ $version_pass == "0" ]; then
+    printf "| WGDashboard required Python 3.7 or above          |\n"
+    printf "%s\n" "$dashes"
+    exit 1
+  fi
+  if [ ! -d "db" ]; then
+    mkdir "db"
+  fi
+  if [ ! -d "log" ]; then
+    mkdir "log"
+  fi
+  printf "| Upgrading pip                                            |\n"
+  python3 -m pip install -U pip >/dev/null 2>&1
+  printf "| Installing latest Python dependencies                    |\n"
+  python3 -m pip install -U -r requirements.txt >/dev/null 2>&1
+  printf "| WGDashboard installed successfully!                      |\n"
+  printf "| Enter ./wgd.sh start to start the dashboard              |\n"
 }
 
-
-check_wgd_status(){
+check_wgd_status() {
   if test -f "$PID_FILE"; then
-    if ps aux | grep -v grep | grep $(cat ./gunicorn.pid)  > /dev/null; then
-    return 0
+    if ps aux | grep -v grep | grep $(cat ./gunicorn.pid) >/dev/null; then
+      return 0
     else
       return 1
     fi
   else
-    if ps aux | grep -v grep | grep '[p]ython3 '$app_name > /dev/null; then
+    if ps aux | grep -v grep | grep '[p]ython3 '$app_name >/dev/null; then
       return 0
     else
       return 1
@@ -83,15 +82,15 @@ check_wgd_status(){
   fi
 }
 
-certbot_create_ssl () {
+certbot_create_ssl() {
   certbot certonly --config ./certbot.ini --email "$EMAIL" --work-dir $cb_work_dir --config-dir $cb_config_dir --domain "$SERVERURL"
 }
 
-certbot_renew_ssl () {
+certbot_renew_ssl() {
   certbot renew --work-dir $cb_work_dir --config-dir $cb_config_dir
 }
 
-gunicorn_start () {
+gunicorn_start() {
   access_log='-'
   error_log='-'
   if [ -z "$IN_DOCKER" ] || [ "$IN_DOCKER" -eq 0 ]; then
@@ -100,7 +99,7 @@ gunicorn_start () {
     printf "%s\n" "$dashes"
     printf "| Starting WGDashboard with Gunicorn in the background.    |\n"
   fi
-  if [ ! -d "log" ] &&  [ -z "$IN_DOCKER" ] || [ "$IN_DOCKER" -eq 0 ]; then
+  if [ ! -d "log" ] && [ -z "$IN_DOCKER" ] || [ "$IN_DOCKER" -eq 0 ]; then
     mkdir "log"
   fi
   d=$(date '+%Y%m%d%H%M%S')
@@ -108,19 +107,19 @@ gunicorn_start () {
     export PATH=$PATH:/usr/local/bin:$HOME/.local/bin
   fi
   gunicorn --access-logfile $access_log \
-  --error-logfile $error_log 'dashboard:run_dashboard()'
+    --error-logfile $error_log 'dashboard:run_dashboard()'
   if [ -z "$IN_DOCKER" ] || [ "$IN_DOCKER" -eq 0 ]; then
     printf "| Log files is under log/                                  |\n"
     printf "%s\n" "$dashes"
   fi
 }
 
-gunicorn_stop () {
+gunicorn_stop() {
   kill $(cat ./gunicorn.pid)
 }
 
-start_wgd () {
-    gunicorn_start
+start_wgd() {
+  gunicorn_start
 }
 
 stop_wgd() {
@@ -150,12 +149,12 @@ update_wgd() {
     fi
     mv wgd.sh wgd.sh.old
     printf "| Downloading %s from GitHub...                            |\n" "$new_ver"
-    git stash > /dev/null 2>&1
-    git pull https://github.com/donaldzou/WGDashboard.git $new_ver --force >  /dev/null 2>&1
+    git stash >/dev/null 2>&1
+    git pull https://github.com/donaldzou/WGDashboard.git $new_ver --force >/dev/null 2>&1
     printf "| Upgrading pip                                            |\n"
-    python3 -m pip install -U pip > /dev/null 2>&1
+    python3 -m pip install -U pip >/dev/null 2>&1
     printf "| Installing latest Python dependencies                    |\n"
-    python3 -m pip install -U -r requirements.txt > /dev/null 2>&1
+    python3 -m pip install -U -r requirements.txt >/dev/null 2>&1
     printf "| Update Successfully!                                     |\n"
     printf "%s\n" "$dashes"
     rm wgd.sh.old
@@ -166,53 +165,51 @@ update_wgd() {
   fi
 }
 
-
-if [ "$#" != 1 ];
-  then
-    help
-  else
-    if [ "$1" = "start" ]; then
-        if check_wgd_status; then
-          printf "%s\n" "$dashes"
-          printf "| WGDashboard is already running.                          |\n"
-          printf "%s\n" "$dashes"
-          else
-            start_wgd
-        fi
-      elif [ "$1" = "stop" ]; then
-        if check_wgd_status; then
-            printf "%s\n" "$dashes"
-            stop_wgd
-            printf "| WGDashboard is stopped.                                  |\n"
-            printf "%s\n" "$dashes"
-            else
-              printf "%s\n" "$dashes"
-              printf "| WGDashboard is not running.                              |\n"
-              printf "%s\n" "$dashes"
-        fi
-      elif [ "$1" = "update" ]; then
-        update_wgd
-      elif [ "$1" = "install" ]; then
-        printf "%s\n" "$dashes"
-        install_wgd
-        printf "%s\n" "$dashes"
-      elif [ "$1" = "restart" ]; then
-         if check_wgd_status; then
-           printf "%s\n" "$dashes"
-           stop_wgd
-           printf "| WGDashboard is stopped.                                  |\n"
-           sleep 4
-           start_wgd
-        else
-          start_wgd
-        fi
-      elif [ "$1" = "debug" ]; then
-        if check_wgd_status; then
-          printf "| WGDashboard is already running.                          |\n"
-          else
-            start_wgd_debug
-        fi
-      else
-        help
+if [ "$#" != 1 ]; then
+  help
+else
+  if [ "$1" = "start" ]; then
+    if check_wgd_status; then
+      printf "%s\n" "$dashes"
+      printf "| WGDashboard is already running.                          |\n"
+      printf "%s\n" "$dashes"
+    else
+      start_wgd
     fi
+  elif [ "$1" = "stop" ]; then
+    if check_wgd_status; then
+      printf "%s\n" "$dashes"
+      stop_wgd
+      printf "| WGDashboard is stopped.                                  |\n"
+      printf "%s\n" "$dashes"
+    else
+      printf "%s\n" "$dashes"
+      printf "| WGDashboard is not running.                              |\n"
+      printf "%s\n" "$dashes"
+    fi
+  elif [ "$1" = "update" ]; then
+    update_wgd
+  elif [ "$1" = "install" ]; then
+    printf "%s\n" "$dashes"
+    install_wgd
+    printf "%s\n" "$dashes"
+  elif [ "$1" = "restart" ]; then
+    if check_wgd_status; then
+      printf "%s\n" "$dashes"
+      stop_wgd
+      printf "| WGDashboard is stopped.                                  |\n"
+      sleep 4
+      start_wgd
+    else
+      start_wgd
+    fi
+  elif [ "$1" = "debug" ]; then
+    if check_wgd_status; then
+      printf "| WGDashboard is already running.                          |\n"
+    else
+      start_wgd_debug
+    fi
+  else
+    help
+  fi
 fi
