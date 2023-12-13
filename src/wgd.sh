@@ -92,19 +92,27 @@ certbot_renew_ssl () {
 }
 
 gunicorn_start () {
-  printf "%s\n" "$dashes"
-  printf "| Starting WGDashboard with Gunicorn in the background.    |\n"
-  if [ ! -d "log" ]; then
+  access_log='-'
+  error_log='-'
+  if [ -z "$IN_DOCKER" ] || [ "$IN_DOCKER" -eq 0 ]; then
+    access_log=log/access_"$d".log
+    error_log=log/error_"$d".log
+    printf "%s\n" "$dashes"
+    printf "| Starting WGDashboard with Gunicorn in the background.    |\n"
+  fi
+  if [ ! -d "log" ] &&  [ -z "$IN_DOCKER" ] || [ "$IN_DOCKER" -eq 0 ]; then
     mkdir "log"
   fi
   d=$(date '+%Y%m%d%H%M%S')
   if [[ $USER == root ]]; then
     export PATH=$PATH:/usr/local/bin:$HOME/.local/bin
   fi
-  gunicorn --access-logfile log/access_"$d".log \
-  --error-logfile log/error_"$d".log 'dashboard:run_dashboard()'
-  printf "| Log files is under log/                                  |\n"
-  printf "%s\n" "$dashes"
+  gunicorn --access-logfile $access_log \
+  --error-logfile $error_log 'dashboard:run_dashboard()'
+  if [ -z "$IN_DOCKER" ] || [ "$IN_DOCKER" -eq 0 ]; then
+    printf "| Log files is under log/                                  |\n"
+    printf "%s\n" "$dashes"
+  fi
 }
 
 gunicorn_stop () {
