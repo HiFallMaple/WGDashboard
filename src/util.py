@@ -69,13 +69,13 @@ def check_DNS(dns):
     dns = dns.replace(' ', '').split(',')
     status = True
     for i in dns:
-        if not (check_IP(i) or regex_match("(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z]{0,61}[a-z]", i)):
+        if not (check_IP(i) or regex_match(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z]{0,61}[a-z]", i)):
             return False
     return True
 
 
 # Check remote endpoint
 def check_remote_endpoint(address):
-    return (check_IP(address) or regex_match("(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z]{0,61}[a-z]",
+    return (check_IP(address) or regex_match(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z]{0,61}[a-z]",
                                              address))
 
