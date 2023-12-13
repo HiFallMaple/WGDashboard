@@ -1638,7 +1638,7 @@ def init_dashboard():
     if 'peer_display_mode' not in config['Peers']:
         config['Peers']['peer_display_mode'] = 'grid'
     if 'remote_endpoint' not in config['Peers']:
-        config['Peers']['remote_endpoint'] = ifcfg.default_interface()['inet']
+        config['Peers']['remote_endpoint'] = os.getenv("DEFAULT_REMOTE_ENDPOINT", ifcfg.default_interface()['inet'])
     if 'peer_MTU' not in config['Peers']:
         config['Peers']['peer_MTU'] = "1420"
     if 'peer_keep_alive' not in config['Peers']:
