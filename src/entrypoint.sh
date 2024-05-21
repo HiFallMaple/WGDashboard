@@ -2,7 +2,7 @@
 
 directory="/etc/wireguard"
 
-if [ -n $(ls -A $directory) ]; then
+if [ ! -e $directory ]; then
     private=$(wg genkey)
     public=$(echo $private | wg pubkey)
     conf=wg0

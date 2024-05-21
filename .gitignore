@@ -5,7 +5,7 @@ src/db
 __pycache__
 src/test.py
 *.db
-src/wg-dashboard.ini
+config/wg-dashboard.ini
 src/static/pic.xd
 *.conf
 private_key.txt
