@@ -27,4 +27,5 @@ EOL
     chmod 700 $directory/$conf.conf
 fi
 
+wg-quick up wg0
 cd /app && ./wgd.sh start
