@@ -7,7 +7,7 @@ RUN apt-get update -y && apt-get install -y wireguard net-tools iproute2 iptable
 RUN chmod u+x entrypoint.sh
 RUN chmod u+x wgd.sh
 RUN ./wgd.sh install
-RUN mkdir config
+RUN mkdir -p config
 ENV CONFIGURATION_PATH=config
 ENV IN_DOCKER=1
 

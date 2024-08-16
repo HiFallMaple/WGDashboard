@@ -1,11 +1,11 @@
 #!/bin/bash
 
 directory="/etc/wireguard"
+conf=wg0
 
-if [ ! -e $directory ]; then
+if [ ! -f $directory/$conf.conf ]; then
     private=$(wg genkey)
     public=$(echo $private | wg pubkey)
-    conf=wg0
     int=eth0
 	cat > $directory/$conf.conf <<EOL
 [Interface]
@@ -25,6 +25,8 @@ PostDown = iptables -D FORWARD -o $conf -j ACCEPT
 PostDown = iptables -t nat -A POSTROUTING -s $WG_ADDRESS -o $int -j MASQUERADE
 EOL
     chmod 700 $directory/$conf.conf
+else
+    echo "wg0.conf already exist."
 fi
 
 wg-quick up wg0
